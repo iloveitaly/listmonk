@@ -419,12 +419,6 @@ func handleTestCampaign(c echo.Context) error {
 		return err
 	}
 
-	// Validate.
-	if c, err := validateCampaignFields(req, app); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	} else {
-		req = c
-	}
 	if len(req.SubscriberEmails) == 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, app.i18n.T("campaigns.noSubsToTest"))
 	}
@@ -445,19 +439,40 @@ func handleTestCampaign(c echo.Context) error {
 		return err
 	}
 
-	// Override certain values from the DB with incoming values.
-	camp.Name = req.Name
-	camp.Subject = req.Subject
-	camp.FromEmail = req.FromEmail
-	camp.Body = req.Body
-	camp.AltBody = req.AltBody
-	camp.Messenger = req.Messenger
-	camp.ContentType = req.ContentType
-	camp.Headers = req.Headers
-	camp.TemplateID = req.TemplateID
-	for _, id := range req.MediaIDs {
-		if id > 0 {
-			camp.MediaIDs = append(camp.MediaIDs, int64(id))
+	// Override certain values from the DB with incoming values (if provided).
+	if req.Name != "" {
+		camp.Name = req.Name
+	}
+	if req.Subject != "" {
+		camp.Subject = req.Subject
+	}
+	if req.FromEmail != "" {
+		camp.FromEmail = req.FromEmail
+	}
+	if req.Body != "" {
+		camp.Body = req.Body
+	}
+	if req.AltBody.Valid {
+		camp.AltBody = req.AltBody
+	}
+	if req.Messenger != "" {
+		camp.Messenger = req.Messenger
+	}
+	if req.ContentType != "" {
+		camp.ContentType = req.ContentType
+	}
+	if len(req.Headers) > 0 {
+		camp.Headers = req.Headers
+	}
+	if req.TemplateID > 0 {
+		camp.TemplateID = req.TemplateID
+	}
+	if len(req.MediaIDs) > 0 {
+		camp.MediaIDs = []int64{}
+		for _, id := range req.MediaIDs {
+			if id > 0 {
+				camp.MediaIDs = append(camp.MediaIDs, int64(id))
+			}
 		}
 	}
 
