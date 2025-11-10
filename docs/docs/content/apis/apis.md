@@ -2,7 +2,21 @@
 
 All features that are available on the listmonk dashboard are also available as REST-like HTTP APIs that can be interacted with directly. Request and response bodies are JSON. This allows easy scripting of listmonk and integration with other systems, for instance, synchronisation with external subscriber databases.
 
-API requests require BasicAuth authentication with the admin credentials.
+## Authentication
+
+API requests require HTTP BasicAuth authentication using the admin credentials configured in your `config.toml` file or via environment variables.
+
+- **Username**: The value of `app.admin_username` from your configuration (e.g., `listmonk`)
+- **Password**: The value of `app.admin_password` from your configuration
+
+**Example curl request:**
+```shell
+curl -u "username:password" http://localhost:9000/api/lists
+```
+
+Replace `username` and `password` with your configured `admin_username` and `admin_password` values respectively.
+
+See [Configuration](../configuration) for more details on setting these credentials.
 
 > The API section is a work in progress. There may be API calls that are yet to be documented. Please consider contributing to docs.
 
